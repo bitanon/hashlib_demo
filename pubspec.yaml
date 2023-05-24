@@ -10,7 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   hive: ^2.2.3
-  hashlib: ^1.11.3
+  hashlib: ^1.11.4
+  hashlib_codecs: ^1.2.0
   share_plus: ^7.0.0
   file_picker: ^5.3.0
   path_provider: ^2.0.15

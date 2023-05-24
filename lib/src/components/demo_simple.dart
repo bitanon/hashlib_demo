@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hashlib/hashlib.dart' show HashBase, HashDigest;
 import 'package:hashlib_demo/src/components/digest_view.dart';
-import 'package:hashlib_demo/src/components/input_form.dart';
+import 'package:hashlib_demo/src/form/input_form.dart';
 import 'package:hashlib_demo/src/utils/converter.dart';
 
 class SimpleDemoPage extends StatefulWidget {
@@ -27,7 +27,6 @@ class _SimpleDemoPageState extends State<SimpleDemoPage> {
       if (value == null || value.isEmpty || format.value == null) {
         return null;
       }
-      print(value);
       var i = format.value?.apply(value);
       if (i != null && i.isNotEmpty) return null;
       return 'Invalid ${format.value} string';

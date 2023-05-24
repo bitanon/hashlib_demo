@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hashlib/hashlib.dart'
     show sha512, sha512t224, sha512t256, HashDigest;
 import 'package:hashlib_demo/src/components/digest_view.dart';
-import 'package:hashlib_demo/src/components/input_form.dart';
+import 'package:hashlib_demo/src/form/input_form.dart';
 import 'package:hashlib_demo/src/utils/converter.dart';
 
 class SHA512Demo extends StatefulWidget {
@@ -14,7 +14,7 @@ class SHA512Demo extends StatefulWidget {
 
 class _SHA512DemoState extends State<SHA512Demo> {
   HashDigest? digest;
-  var variation = SelectionFormField(
+  final variation = SelectionFormField(
     label: 'Variation',
     value: '512 bits',
     options: [
@@ -23,12 +23,12 @@ class _SHA512DemoState extends State<SHA512Demo> {
       '224 bits',
     ],
   );
-  var format = SelectionFormField(
+  final format = SelectionFormField(
     label: 'Input format',
     value: TextInputFormat.utf8,
     options: TextInputFormat.values,
   );
-  var input = TextInputFormField(
+  final input = TextInputFormField(
     label: 'Input text',
     value: 'Hashlib',
   );

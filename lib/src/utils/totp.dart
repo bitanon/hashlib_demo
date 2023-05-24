@@ -1,4 +1,5 @@
 import 'package:hashlib/hashlib.dart';
+import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 String toOTPAuthURL(TOTP totp) {
   return Uri(
@@ -7,7 +8,7 @@ String toOTPAuthURL(TOTP totp) {
     path: '${totp.label}',
     queryParameters: {
       'issuer': totp.issuer,
-      'secret': toBase32(totp.secret, upper: true, padding: false),
+      'secret': toBase32(totp.secret, padding: false),
       'algorithm': totp.algorithm,
       'digits': totp.digits.toString(),
       'period': totp.period.toString(),

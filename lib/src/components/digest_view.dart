@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hashlib/hashlib.dart' show HashDigest;
-import 'package:hashlib_demo/src/components/input_form.dart';
+import 'package:hashlib_demo/src/form/input_form.dart';
 import 'package:hashlib_demo/src/utils/converter.dart';
 import 'package:hashlib_demo/src/utils/utils.dart';
 import 'package:hive/hive.dart';
 
 class HashDigestView extends StatefulWidget {
   final HashDigest? digest;
-  final TextOutputFormat format;
 
-  const HashDigestView(
-    this.digest, {
-    super.key,
-    this.format = TextOutputFormat.base16,
-  });
+  const HashDigestView(this.digest, {super.key});
 
   @override
   State<StatefulWidget> createState() => _HashDigestViewState();
@@ -37,7 +32,7 @@ class _HashDigestViewState extends State<HashDigestView> {
     config = await Hive.openBox('app-config');
     int saved = config!.get(
       'digest format',
-      defaultValue: widget.format.index,
+      defaultValue: format.value,
     );
     format.value = TextOutputFormat.values[saved];
     if (mounted) setState(makeDigest);
@@ -53,7 +48,6 @@ class _HashDigestViewState extends State<HashDigestView> {
 
   @override
   void initState() {
-    format.value = widget.format;
     makeDigest();
     super.initState();
     openConfig();
@@ -62,7 +56,6 @@ class _HashDigestViewState extends State<HashDigestView> {
   @override
   void didUpdateWidget(covariant HashDigestView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    format.value = widget.format;
     makeDigest();
     openConfig();
   }

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hashlib/hashlib.dart';
+import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:hashlib_demo/src/utils/utils.dart';
 import 'package:hive/hive.dart';
 import 'package:share_plus/share_plus.dart';
@@ -90,7 +91,7 @@ Future<void> importOTPBox(BuildContext context) async {
 
     var parts = file.name.split('.');
     var sign = parts[parts.length - 1];
-    if (fromBase64Url(sign).length != 8) {
+    if (fromBase64(sign).length != 8) {
       throw Exception('Invalid sign');
     }
     var version = int.tryParse(parts[parts.length - 2]);

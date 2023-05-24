@@ -2,7 +2,7 @@ import 'dart:isolate';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:hashlib_demo/src/components/input_form.dart';
+import 'package:hashlib_demo/src/form/input_form.dart';
 import 'package:hashlib_demo/src/utils/benchmark.dart';
 import 'package:hive/hive.dart';
 

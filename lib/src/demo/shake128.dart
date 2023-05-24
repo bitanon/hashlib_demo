@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hashlib/hashlib.dart' show Shake128, shake128_256, HashDigest;
+import 'package:hashlib/hashlib.dart' show Shake128, HashDigest;
 import 'package:hashlib_demo/src/components/digest_view.dart';
-import 'package:hashlib_demo/src/components/input_text.dart';
-import 'package:hashlib_demo/src/components/slider.dart';
-
-const _initialText = 'Hashlib';
+import 'package:hashlib_demo/src/form/input_form.dart';
+import 'package:hashlib_demo/src/form/slider_input_field.dart';
+import 'package:hashlib_demo/src/utils/converter.dart';
 
 class SHAKE128Demo extends StatefulWidget {
   const SHAKE128Demo({super.key});
@@ -14,12 +13,34 @@ class SHAKE128Demo extends StatefulWidget {
 }
 
 class _SHAKE128DemoState extends State<SHAKE128Demo> {
-  int bitLength = 256;
-  var input = TextEditingController(text: _initialText);
-  HashDigest? digest = shake128_256.string(_initialText);
+  HashDigest? digest;
+  final outputLength = SliderInputFormField(
+    label: 'Output length',
+    prefix: 'Bits',
+    min: 8,
+    max: 1024,
+    step: 8,
+    value: 256,
+  );
+  final format = SelectionFormField(
+    label: 'Input format',
+    value: TextInputFormat.utf8,
+    options: TextInputFormat.values,
+  );
+  final input = TextInputFormField(
+    label: 'Input text',
+    value: 'Hashlib',
+  );
 
   void makeDigest() {
-    digest = Shake128(bitLength >>> 3).string(input.text);
+    var bytes = format.value?.apply(input.value) ?? [];
+    digest = Shake128(outputLength.value! >>> 3).convert(bytes);
+  }
+
+  @override
+  void initState() {
+    makeDigest();
+    super.initState();
   }
 
   @override
@@ -28,25 +49,14 @@ class _SHAKE128DemoState extends State<SHAKE128Demo> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        SliderInput(
-          label: 'Output length',
-          prefix: 'Bits',
-          value: bitLength,
-          min: 8,
-          max: 1024,
-          step: 8,
-          onChanged: (value) {
-            if (value == bitLength) return;
-            setState(() {
-              bitLength = value;
-              makeDigest();
-            });
-          },
-        ),
-        const SizedBox(height: 10),
-        InputTextField(
-          controller: input,
-          onChanged: (_) => setState(makeDigest),
+        InputForm(
+          itemGap: 10,
+          onChange: (_) => setState(makeDigest),
+          inputs: [
+            outputLength,
+            format,
+            input,
+          ],
         ),
         const Divider(height: 30),
         HashDigestView(digest),

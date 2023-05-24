@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hashlib/hashlib.dart' show XXH3, HashDigest;
 import 'package:hashlib_demo/src/components/digest_view.dart';
-import 'package:hashlib_demo/src/components/input_form.dart';
+import 'package:hashlib_demo/src/form/input_form.dart';
 import 'package:hashlib_demo/src/utils/converter.dart';
 
 class XXH3Demo extends StatefulWidget {

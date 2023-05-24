@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:hashlib/hashlib.dart' show TOTP;
-import 'package:hashlib_demo/src/components/input_text.dart';
 import 'package:hashlib_demo/src/pages/auth.dart';
 import 'package:hashlib_demo/src/utils/hive_box.dart';
 import 'package:hashlib_demo/src/utils/totp.dart';
@@ -220,12 +219,18 @@ class OTPAuthViewer extends StatelessWidget {
           actionsPadding: const EdgeInsets.all(15).copyWith(top: 0),
           content: SizedBox(
             width: 400,
-            child: InputTextField(
-              label: 'OTP Auth URL',
+            child: TextFormField(
               controller: input,
               maxLines: 10,
               maxLength: 10000,
-              onSubmit: Navigator.of(context).pop,
+              onFieldSubmitted: Navigator.of(context).pop,
+              decoration: const InputDecoration(
+                labelText: 'OTP Auth URL',
+                hintText: 'otpauth://totp/...\n'
+                    'otpauth-migration://offline?data=...',
+                border: OutlineInputBorder(),
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+              ),
             ),
           ),
           actions: <Widget>[
