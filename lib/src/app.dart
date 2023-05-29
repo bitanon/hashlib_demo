@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hashlib_demo/src/pages/about.dart';
 import 'package:hashlib_demo/src/pages/auth.dart';
 import 'package:hashlib_demo/src/pages/benchmark.dart';
 import 'package:hashlib_demo/src/pages/demo.dart';
@@ -63,13 +64,18 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int page = 0;
+  bool reversed = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: page,
-        onTap: (index) => setState(() => page = index),
+        onTap: (index) {
+          reversed = page > index;
+          page = index;
+          setState(() => {});
+        },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_outlined),
@@ -102,15 +108,23 @@ class _HomePageState extends State<HomePage> {
         ][page],
       ),
       body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 200),
+        reverseDuration: Duration.zero,
+        switchInCurve: Curves.easeInOut,
         transitionBuilder: (child, animation) {
-          return FadeTransition(opacity: animation, child: child);
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: Offset(reversed ? -1 : 1, 0),
+              end: Offset.zero,
+            ).animate(animation),
+            child: child,
+          );
         },
         child: <Widget>[
           const DemoPage(),
           const BenchmarkPage(),
           const AuthPage(),
-          Container(),
+          const AboutPage(),
         ][page],
       ),
     );

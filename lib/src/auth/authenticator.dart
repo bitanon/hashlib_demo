@@ -1,138 +1,101 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:hashlib/hashlib.dart' show TOTP;
-import 'package:hashlib_demo/src/pages/auth.dart';
+import 'package:hashlib_demo/src/auth/totp_scanners.dart';
 import 'package:hashlib_demo/src/utils/hive_box.dart';
 import 'package:hashlib_demo/src/utils/totp.dart';
 import 'package:hashlib_demo/src/utils/utils.dart';
+import 'package:hive/hive.dart';
 
-class OTPAuthViewer extends StatelessWidget {
-  final void Function()? onClosed;
-  final Iterable<TOTP> instances;
-  final ValueChanged<Iterable<TOTP>> onChanged;
+import 'import_export.dart';
 
-  const OTPAuthViewer({
-    super.key,
-    this.onClosed,
-    required this.instances,
-    required this.onChanged,
-  });
+class AuthenticatorDialog extends StatefulWidget {
+  final Box<String> authBox;
+
+  const AuthenticatorDialog(this.authBox, {super.key});
+
+  @override
+  State<StatefulWidget> createState() => _AuthenticatorDialogState();
+
+  String get authSign {
+    var parts = authBox.path!.split('.');
+    return parts[parts.length - 2];
+  }
+}
+
+class _AuthenticatorDialogState extends State<AuthenticatorDialog> {
+  late Iterable<TOTP> instances;
+
+  void readInstances() {
+    instances = readOTPEntries(widget.authBox);
+  }
+
+  void saveInstances(Iterable<TOTP> values) async {
+    try {
+      await saveOTPEntries(widget.authBox, values);
+    } catch (err) {
+      openSnackBar(context, 'Failed to update.\n$err');
+    } finally {
+      if (mounted) setState(readInstances);
+    }
+  }
+
+  bool onUrlReceive(String? text) {
+    if (text == null || text.isEmpty) return false;
+    final newItems = parseTOTP(text).toList();
+    if (newItems.isEmpty) return false;
+    saveInstances([...instances, ...newItems]);
+    return true;
+  }
+
+  void importInstances(Iterable<TOTP> values) {
+    saveInstances([...instances, ...values]);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    setState(readInstances);
+  }
+
+  @override
+  void dispose() {
+    widget.authBox.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(height: 10),
-        Builder(builder: buildScanner),
-        const SizedBox(height: 10),
-        Builder(builder: buildImportExport),
-        const SizedBox(height: 10),
-        const Divider(height: 1),
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.all(10),
-            children: [
-              ...instances.map(buildItem),
-            ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Authenticator: ${widget.authSign}'),
+      ),
+      body: Column(
+        children: [
+          const SizedBox(height: 10),
+          ImportExportButtons(
+            path: widget.authBox.path!,
+            onImport: importInstances,
           ),
-        ),
-        const Divider(height: 1),
-        InkWell(
-          onTap: onClosed,
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+          const SizedBox(height: 10),
+          const Divider(height: 1),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(10),
               children: [
-                Icon(Icons.logout),
-                SizedBox(width: 10),
-                Text('Close Authenticator'),
+                ...instances.map(buildItem),
               ],
             ),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget buildScanner(BuildContext context) {
-    return Row(
-      children: [
-        const SizedBox(width: 15),
-        ...(Platform.isMacOS || Platform.isAndroid || Platform.isIOS
-            ? [
-                Expanded(
-                  child: Card(
-                    elevation: 2,
-                    margin: const EdgeInsets.all(0),
-                    child: ListTile(
-                      onTap: () => scanQR(context),
-                      title: const Text(
-                        'Scan QR',
-                        softWrap: false,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      leading: const Icon(Icons.qr_code),
-                      trailing: const Icon(Icons.chevron_right),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-              ]
-            : []),
-        Expanded(
-          child: Card(
-            elevation: 2,
-            margin: const EdgeInsets.all(0),
-            child: ListTile(
-              onTap: () => parseText(context),
-              title: const Text(
-                'Add URL',
-                softWrap: false,
-                overflow: TextOverflow.ellipsis,
-              ),
-              leading: const Icon(Icons.input),
-              trailing: const Icon(Icons.chevron_right),
-            ),
+          const Divider(height: 1),
+          const SizedBox(height: 10),
+          TOTPScannerButtons(
+            onUrlReceive: onUrlReceive,
           ),
-        ),
-        const SizedBox(width: 15),
-      ],
-    );
-  }
-
-  Widget buildImportExport(BuildContext context) {
-    return Row(
-      children: [
-        const SizedBox(width: 15),
-        Expanded(
-          child: Card(
-            elevation: 2,
-            margin: const EdgeInsets.all(0),
-            child: ListTile(
-              onTap: () => importOTPBox(context),
-              title: const Text('Import'),
-              leading: const Icon(Icons.file_download_outlined),
-            ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Card(
-            elevation: 2,
-            margin: const EdgeInsets.all(0),
-            child: ListTile(
-              onTap: () => exportOTPBox(context, authBox!),
-              title: const Text('Export'),
-              leading: const Icon(Icons.share_outlined),
-            ),
-          ),
-        ),
-        const SizedBox(width: 15),
-      ],
+          const SizedBox(height: 10),
+        ],
+      ),
     );
   }
 
@@ -180,80 +143,6 @@ class OTPAuthViewer extends StatelessWidget {
     );
   }
 
-  bool checkTextForUrl(String? text) {
-    if (text == null || text.isEmpty) return false;
-    final newItems = parseTOTP(text).toList();
-    if (newItems.isEmpty) return false;
-    onChanged([...instances, ...newItems]);
-    return true;
-  }
-
-  void scanQR(BuildContext context) async {
-    var messenger = ScaffoldMessenger.of(context);
-    try {
-      var text = await FlutterBarcodeScanner.scanBarcode(
-        '#ff6666',
-        "Cancel",
-        false,
-        ScanMode.QR,
-      );
-      if (!checkTextForUrl(text)) {
-        showSnackBar(messenger, 'Invalid OTP Auth URL');
-      }
-    } catch (err) {
-      showSnackBar(messenger, 'Failed to read QR code');
-    }
-  }
-
-  void parseText(BuildContext context) async {
-    var messenger = ScaffoldMessenger.of(context);
-    final text = await showDialog<String>(
-      context: context,
-      builder: (context) {
-        final input = TextEditingController();
-        return AlertDialog(
-          title: const Text('Enter OTP Auth URL'),
-          insetPadding: const EdgeInsets.all(20),
-          titlePadding: const EdgeInsets.all(20).copyWith(bottom: 0),
-          contentPadding: const EdgeInsets.all(20).copyWith(bottom: 0),
-          actionsPadding: const EdgeInsets.all(15).copyWith(top: 0),
-          content: SizedBox(
-            width: 400,
-            child: TextFormField(
-              controller: input,
-              maxLines: 10,
-              maxLength: 10000,
-              onFieldSubmitted: Navigator.of(context).pop,
-              decoration: const InputDecoration(
-                labelText: 'OTP Auth URL',
-                hintText: 'otpauth://totp/...\n'
-                    'otpauth-migration://offline?data=...',
-                border: OutlineInputBorder(),
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-              ),
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).primaryColor,
-              ),
-              child: const Text('Submit'),
-              onPressed: () => Navigator.of(context).pop(input.text),
-            ),
-          ],
-        );
-      },
-    );
-    if (!checkTextForUrl(text)) {
-      showSnackBar(messenger, 'Invalid OTP Auth URL');
-    }
-  }
-
   void deleteItem(BuildContext context, TOTP totp) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -279,10 +168,8 @@ class OTPAuthViewer extends StatelessWidget {
       ),
     );
     if (confirmed == true) {
-      onChanged(
-        instances.where(
-          (item) => toOTPAuthURL(totp) != toOTPAuthURL(item),
-        ),
+      saveInstances(
+        instances.where((item) => toOTPAuthURL(totp) != toOTPAuthURL(item)),
       );
     }
   }

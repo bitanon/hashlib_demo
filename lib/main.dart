@@ -4,6 +4,7 @@ import 'package:hashlib_demo/src/utils/utils.dart';
 import 'package:hive/hive.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   Hive.init(await getAppHomeDirectory());
   runApp(const App());
 }
