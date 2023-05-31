@@ -25,39 +25,18 @@ class _HashDigestViewState extends State<HashDigestView> {
 
   makeDigest() {
     content = format.value?.apply(widget.digest?.bytes) ?? '';
-    saveConfig();
-  }
-
-  openConfig() async {
-    config = await Hive.openBox('app-config');
-    int saved = config!.get(
-      'digest format',
-      defaultValue: format.value,
-    );
-    format.value = TextOutputFormat.values[saved];
-    if (mounted) setState(makeDigest);
-  }
-
-  saveConfig() async {
-    if (config == null || format.value == null) return;
-    await config!.put(
-      'digest format',
-      format.value!.index,
-    );
   }
 
   @override
   void initState() {
     makeDigest();
     super.initState();
-    openConfig();
   }
 
   @override
   void didUpdateWidget(covariant HashDigestView oldWidget) {
     super.didUpdateWidget(oldWidget);
     makeDigest();
-    openConfig();
   }
 
   @override
