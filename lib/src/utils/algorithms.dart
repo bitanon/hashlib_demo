@@ -1,5 +1,32 @@
 import 'package:flutter/material.dart';
 
+import '../benchmark/blake2b.dart';
+import '../benchmark/blake2s.dart';
+import '../benchmark/keccak224.dart';
+import '../benchmark/keccak256.dart';
+import '../benchmark/keccak384.dart';
+import '../benchmark/keccak512.dart';
+import '../benchmark/md5.dart';
+import '../benchmark/ripemd128.dart';
+import '../benchmark/ripemd160.dart';
+import '../benchmark/ripemd256.dart';
+import '../benchmark/ripemd320.dart';
+import '../benchmark/sha1.dart';
+import '../benchmark/sha224.dart';
+import '../benchmark/sha256.dart';
+import '../benchmark/sha384.dart';
+import '../benchmark/sha3_224.dart';
+import '../benchmark/sha3_256.dart';
+import '../benchmark/sha3_384.dart';
+import '../benchmark/sha3_512.dart';
+import '../benchmark/sha512.dart';
+import '../benchmark/xxh128.dart';
+import '../benchmark/xxh3.dart';
+import '../benchmark/xxh32.dart';
+import '../benchmark/xxh64.dart';
+
+import '../demo/blake2b.dart';
+import '../demo/blake2s.dart';
 import '../demo/keccak224.dart';
 import '../demo/keccak256.dart';
 import '../demo/keccak384.dart';
@@ -24,29 +51,6 @@ import '../demo/xxh128.dart';
 import '../demo/xxh3.dart';
 import '../demo/xxh32.dart';
 import '../demo/xxh64.dart';
-
-import '../benchmark/keccak224.dart';
-import '../benchmark/keccak256.dart';
-import '../benchmark/keccak384.dart';
-import '../benchmark/keccak512.dart';
-import '../benchmark/md5.dart';
-import '../benchmark/ripemd128.dart';
-import '../benchmark/ripemd160.dart';
-import '../benchmark/ripemd256.dart';
-import '../benchmark/ripemd320.dart';
-import '../benchmark/sha1.dart';
-import '../benchmark/sha224.dart';
-import '../benchmark/sha256.dart';
-import '../benchmark/sha384.dart';
-import '../benchmark/sha3_224.dart';
-import '../benchmark/sha3_256.dart';
-import '../benchmark/sha3_384.dart';
-import '../benchmark/sha3_512.dart';
-import '../benchmark/sha512.dart';
-import '../benchmark/xxh128.dart';
-import '../benchmark/xxh3.dart';
-import '../benchmark/xxh32.dart';
-import '../benchmark/xxh64.dart';
 
 class Algorithm {
   final String name;
@@ -185,6 +189,27 @@ const algorithms = <Algorithm>[
         'been standardized in NIST standards with a change in padding.',
     demo: Keccak512Demo(),
     benchmark: Keccak512Benchmark(),
+  ),
+  Algorithm(
+    name: 'Blake2b',
+    info:
+        "It is a highly secure cryptographic hash function optimized for 64-bit"
+        " platforms. It generates hash values of data ranging from 1 to 64 "
+        "bytes in size. It doesn't require a separate keying mechanism and can "
+        "be used in various applications, serving as a more efficient "
+        "alternative to other hash algorithms like SHA and HMAC-SHA.",
+    demo: Blake2bDemo(),
+    benchmark: Blake2bBenchmark(),
+  ),
+  Algorithm(
+    name: 'Blake2s',
+    info: "It is a cryptographic hash function optimized for 8-bit to 32-bit "
+        "platforms. It generates hash values of data ranging from 1 to 32 bytes"
+        " in size. Blake2s is highly secure and can be used in various "
+        "applications as a fast and secure replacement for legacy algorithms "
+        "like MD5 and HMAC-MD5",
+    demo: Blake2sDemo(),
+    benchmark: Blake2sBenchmark(),
   ),
   Algorithm(
     name: 'RIPEMD-128',
