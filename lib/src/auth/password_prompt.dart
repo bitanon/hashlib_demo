@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
 class PasswordPromptDialog extends StatefulWidget {
-  final String titleText;
-  final String acceptText;
-  final String cancelText;
+  final String? titleText;
+  final String? acceptText;
+  final String? cancelText;
   final VoidCallback? onCancel;
   final ValueChanged<String> onSubmit;
 
   const PasswordPromptDialog({
-    this.titleText = 'Open Authenticator',
-    this.acceptText = 'Enter',
-    required this.onSubmit,
-    this.cancelText = 'Cancel',
-    this.onCancel,
     super.key,
+    this.titleText,
+    this.acceptText,
+    this.cancelText,
+    this.onCancel,
+    required this.onSubmit,
   });
 
   @override
@@ -34,13 +34,12 @@ class _PasswordPromptDialogState extends State<PasswordPromptDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       scrollable: true,
-      title: Text(widget.titleText),
+      title: Text(widget.titleText ?? 'Open Authenticator'),
       content: SizedBox(
         width: 300,
         child: TextFormField(
           controller: password,
           onChanged: checkPassword,
-          onFieldSubmitted: widget.onSubmit,
           obscureText: !showPassword,
           autofocus: true,
           autocorrect: false,
@@ -60,6 +59,7 @@ class _PasswordPromptDialogState extends State<PasswordPromptDialog> {
               ),
             ),
           ),
+          onFieldSubmitted: passwordValid ? (_) => handleSubmit() : null,
           validator: (value) => value == null || value.length < 4
               ? 'At least 4 digits are required'
               : null,
@@ -73,7 +73,7 @@ class _PasswordPromptDialogState extends State<PasswordPromptDialog> {
                     foregroundColor: Theme.of(context).primaryColor,
                   ),
                   onPressed: widget.onCancel,
-                  child: Text(widget.cancelText),
+                  child: Text(widget.cancelText ?? 'Cancel'),
                 )
               ]
             : []),
@@ -83,14 +83,14 @@ class _PasswordPromptDialogState extends State<PasswordPromptDialog> {
           ),
           onPressed: passwordValid ? handleSubmit : null,
           icon: const Icon(Icons.login),
-          label: Text(widget.acceptText),
+          label: Text(widget.acceptText ?? 'Enter'),
         ),
       ],
     );
   }
 
   void handleSubmit() {
-    widget.onSubmit(password.text);
+    widget.onSubmit(password.text.trim());
   }
 
   void togglePasswordVisibility() {
@@ -101,7 +101,7 @@ class _PasswordPromptDialogState extends State<PasswordPromptDialog> {
 
   void checkPassword(String value) {
     setState(() {
-      passwordValid = value.length >= 4;
+      passwordValid = value.trim().length >= 4;
     });
   }
 }

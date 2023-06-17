@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
 void showSnackBar(ScaffoldMessengerState? messenger, String text) {
@@ -31,13 +32,25 @@ Future<void> copyToClipboard({
   }
 }
 
-String formatSize(double size) {
+String formatSize(
+  num size, {
+  String gap = '',
+  String leading = '',
+  String trailing = '',
+}) {
   const suffix = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
   int i;
   for (i = 0; size >= 1000; i++) {
     size /= 1000;
   }
-  return '${size.toStringAsFixed(2)}${suffix[i]}';
+  size = (size * 100).round() / 100;
+  return '$leading${size.toString()}$gap${suffix[i]}$trailing';
+}
+
+String formatDateTime(DateTime datetime) {
+  final date = DateFormat.yMMMd().format(datetime);
+  final time = DateFormat.jms().format(datetime);
+  return '$date $time';
 }
 
 Future<String> getAppHomeDirectory() async {

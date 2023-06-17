@@ -1,9 +1,23 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:hashlib/hashlib.dart';
+import 'package:hashlib_demo/src/utils/utils.dart';
 import 'package:hive/hive.dart';
 
 import 'totp.dart';
+
+class OTPBox {
+  final int size;
+  final String name;
+  final DateTime updatedAt;
+
+  OTPBox({
+    required this.size,
+    required this.name,
+    required this.updatedAt,
+  });
+}
 
 (Uint8List, String) generateKeyPair(String password) {
   int number = int.tryParse(password) ?? 309235206;
@@ -14,12 +28,48 @@ import 'totp.dart';
   return (key, suffix);
 }
 
-Future<Box<String>> openOTPBox(String password) async {
+Future<List<OTPBox>> getBoxList() async {
+  final boxes = <OTPBox>[];
+  final path = await getAppHomeDirectory();
+  for (final file in Directory(path).listSync()) {
+    final stats = file.statSync();
+    if (stats.type != FileSystemEntityType.file) continue;
+    final name = file.path.toLowerCase().split(RegExp(r'[/\\]')).last;
+    final parts = name.split('.');
+    if (parts.length != 3 || parts[0] != 'otpauth' || parts[2] != 'hive') {
+      continue;
+    }
+    final box = OTPBox(
+      name: parts[1],
+      size: stats.size,
+      updatedAt: stats.changed,
+    );
+    boxes.add(box);
+  }
+  return boxes;
+}
+
+Future<Box<String>> openOTPBox(
+  String password, [
+  OTPBox? box,
+]) async {
   final (key, suffix) = generateKeyPair(password);
+  final name = 'OTPAuth.$suffix';
+  if (box != null && box.name != suffix) {
+    throw Exception('Invalid password for authenticator: ${box.name}');
+  }
+  if (box == null && await Hive.boxExists(name)) {
+    throw Exception('Authenticator already exists: $suffix');
+  }
   return Hive.openBox<String>(
-    'OTPAuth.$suffix',
+    name,
     encryptionCipher: HiveAesCipher(key),
   );
+}
+
+Future<void> deleteOTPBox(OTPBox box) async {
+  final name = 'OTPAuth.${box.name}';
+  await Hive.deleteBoxFromDisk(name);
 }
 
 Future<Box<String>> openTempBox(String password, String name, String path) {
