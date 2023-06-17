@@ -35,6 +35,7 @@ class App extends StatelessWidget {
         cardTheme: const CardTheme(
           clipBehavior: Clip.antiAlias,
         ),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 24, 24, 26),
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           showSelectedLabels: true,
           showUnselectedLabels: true,
@@ -70,6 +71,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
+        enableFeedback: true,
         currentIndex: page,
         onTap: (index) {
           reversed = page > index;
@@ -90,7 +92,7 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.vpn_key_outlined),
             activeIcon: Icon(Icons.vpn_key_sharp),
-            label: 'OTP Auth',
+            label: 'Authenticator',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.help_outline),

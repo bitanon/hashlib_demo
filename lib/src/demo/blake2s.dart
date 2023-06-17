@@ -43,7 +43,7 @@ class _Blake2sDemoState extends State<Blake2sDemo> {
     label: 'Key for MAC generation (Optional)',
     minLines: 1,
     validator: (value) {
-      if (value == null) return null;
+      if (value == null || value.isEmpty) return null;
       var key = keyFormat.value?.apply(value) ?? [];
       if (key.length <= 32) return null;
       return 'Key should not exceed 32 bytes';
@@ -58,7 +58,7 @@ class _Blake2sDemoState extends State<Blake2sDemo> {
     label: '8-byte Salt (Optional)',
     minLines: 1,
     validator: (value) {
-      if (value == null) return null;
+      if (value == null || value.isEmpty) return null;
       var salt = saltFormat.value?.apply(value) ?? [];
       if (salt.length == 8) return null;
       return 'Salt should be exactly 8 bytes';
@@ -73,7 +73,7 @@ class _Blake2sDemoState extends State<Blake2sDemo> {
     label: '8-byte Personalization (Optional)',
     minLines: 1,
     validator: (value) {
-      if (value == null) return null;
+      if (value == null || value.isEmpty) return null;
       var salt = extraFormat.value?.apply(value) ?? [];
       if (salt.length == 8) return null;
       return 'Personalization should be exactly 8 bytes';

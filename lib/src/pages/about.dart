@@ -12,45 +12,40 @@ class AboutPage extends StatelessWidget {
       child: Container(
         alignment: Alignment.center,
         padding: const EdgeInsets.all(25),
-        height: MediaQuery.of(context).size.height,
+        constraints: BoxConstraints(
+          minHeight: MediaQuery.of(context).size.height -
+              kBottomNavigationBarHeight -
+              kToolbarHeight,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            InkWell(
-              borderRadius: BorderRadius.circular(100),
-              child: CircleAvatar(
-                maxRadius: 96,
-                child: Image.asset('images/logo.png'),
-              ),
-              onTap: () {
-                launchUrlString(
-                  'https://play.google.com/store/apps/details?id=io.bitanon.hashlib_demo',
-                  mode: LaunchMode.externalApplication,
-                );
-              },
-            ),
+            buildLogo(),
             const SizedBox(height: 10),
             buildAppName(),
             const SizedBox(height: 10),
-            Linkify(
-              text: "A demo app for https://pub.dev/packages/hashlib",
-              options: const LinkifyOptions(humanize: false),
-              linkStyle: const TextStyle(
-                color: Colors.cyanAccent,
-                decoration: TextDecoration.none,
-              ),
-              onOpen: (link) {
-                launchUrlString(
-                  link.url,
-                  mode: LaunchMode.externalApplication,
-                );
-              },
-            ),
+            buildDescription(),
             const SizedBox(height: 25),
           ],
         ),
       ),
+    );
+  }
+
+  Widget buildLogo() {
+    return InkWell(
+      borderRadius: BorderRadius.circular(100),
+      child: CircleAvatar(
+        maxRadius: 96,
+        child: Image.asset('images/logo.png'),
+      ),
+      onTap: () {
+        launchUrlString(
+          'https://play.google.com/store/apps/details?id=io.bitanon.hashlib_demo',
+          mode: LaunchMode.externalApplication,
+        );
+      },
     );
   }
 
@@ -65,6 +60,23 @@ class AboutPage extends StatelessWidget {
         return Text(
           'Hashlib Demo v${info.version}',
           style: Theme.of(context).textTheme.headlineSmall,
+        );
+      },
+    );
+  }
+
+  Widget buildDescription() {
+    return Linkify(
+      text: "A demo app for https://pub.dev/packages/hashlib",
+      options: const LinkifyOptions(humanize: false),
+      linkStyle: const TextStyle(
+        color: Colors.cyanAccent,
+        decoration: TextDecoration.none,
+      ),
+      onOpen: (link) {
+        launchUrlString(
+          link.url,
+          mode: LaunchMode.externalApplication,
         );
       },
     );
