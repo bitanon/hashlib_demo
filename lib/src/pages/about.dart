@@ -14,6 +14,7 @@ class AboutPage extends StatelessWidget {
         padding: const EdgeInsets.all(25),
         constraints: BoxConstraints(
           minHeight: MediaQuery.of(context).size.height -
+              (Scaffold.of(context).appBarMaxHeight ?? 0) -
               kBottomNavigationBarHeight -
               kToolbarHeight,
         ),
@@ -26,7 +27,7 @@ class AboutPage extends StatelessWidget {
             buildAppName(),
             const SizedBox(height: 10),
             buildDescription(),
-            const SizedBox(height: 25),
+            const SizedBox(height: 20),
           ],
         ),
       ),

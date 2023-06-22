@@ -1,7 +1,7 @@
 name: hashlib_demo
 description: A demo for the hashlib package.
 publish_to: 'none'
-version: 1.1.0+6
+version: 1.2.0+7
 environment:
   sdk: '>=3.0.0 <4.0.0'
 
@@ -10,8 +10,8 @@ dependencies:
     sdk: flutter
   hive: ^2.2.3
   intl: ^0.18.1
-  hashlib: ^1.11.4
-  hashlib_codecs: ^1.2.0
+  hashlib: ^1.12.0
+  hashlib_codecs: ^2.1.0
   share_plus: ^7.0.0
   file_picker: ^5.3.0
   path_provider: ^2.0.15
